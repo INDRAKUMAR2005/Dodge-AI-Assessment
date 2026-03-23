@@ -42,41 +42,56 @@ def fetch_graph_visualization_data():
     links = []
     
     try:
-        # Step 1: Get 50 Sales Orders
-        cur.execute("SELECT salesOrder, soldToParty FROM sales_order_headers LIMIT 50")
+        # Step 1: Find the top 5 'Hub' Customers who have the most orders
+        cur.execute("""
+            SELECT soldToParty, COUNT(salesOrder) as c 
+            FROM sales_order_headers 
+            GROUP BY soldToParty 
+            ORDER BY c DESC LIMIT 5
+        """)
+        top_customers = [r["soldToParty"] for r in cur.fetchall()]
+        
+        if not top_customers:
+            return {"nodes": nodes, "links": links}
+            
+        ph_cust = ",".join("?" * len(top_customers))
+        
+        # Step 2: Grab up to 150 Orders belonging to these Hubs
+        cur.execute(f"SELECT salesOrder, soldToParty FROM sales_order_headers WHERE soldToParty IN ({ph_cust}) LIMIT 150", top_customers)
         orders = cur.fetchall()
         
         customer_ids = set()
         for row in orders:
-            order_id = row["salesOrder"]
-            customer_id = row["soldToParty"]
-            customer_ids.add(customer_id)
+            order_id = str(row["salesOrder"]).lstrip('0') or '0'
+            raw_cust_id = row["soldToParty"]
+            customer_id = str(raw_cust_id).lstrip('0') or '0'
+            customer_ids.add(raw_cust_id) # keep raw for SQL
             
             # Add Order Node
             nodes.append({"id": f"Order_{order_id}", "label": "SalesOrder", "name": f"Order {order_id}"})
-            # Add Edge connecting Order -> Customer
+            # Add Edge connecting Order -> Customer Hub
             links.append({"source": f"Order_{order_id}", "target": f"Customer_{customer_id}", "label": "Ordered By"})
 
-        # Step 2: Get the Customers corresponding to those orders
+        # Step 3: Get the Customers corresponding to those orders
         if customer_ids:
             placeholders = ",".join("?" * len(customer_ids))
-            cur.execute(f"SELECT businessPartner, businessPartnerName FROM business_partners WHERE businessPartner IN ({placeholders})", list(customer_ids))
+            cur.execute(f"SELECT businessPartner, businessPartnerFullName FROM business_partners WHERE businessPartner IN ({placeholders})", list(customer_ids))
             for row in cur.fetchall():
-                bp_id = row["businessPartner"]
-                name = row["businessPartnerName"] or bp_id
-                # Add Customer Node
+                bp_id = str(row["businessPartner"]).lstrip('0') or '0'
+                name = row["businessPartnerFullName"] or f"Customer {bp_id}"
+                # Add Customer Node (Hub)
                 nodes.append({"id": f"Customer_{bp_id}", "label": "Customer", "name": name})
                 
-        # Step 3: Get Deliveries fulfilling those orders
-        order_ids = [r["salesOrder"] for r in orders]
-        if order_ids:
-            ph = ",".join("?" * len(order_ids))
-            cur.execute(f"SELECT deliveryDocument, referenceSdDocument FROM outbound_delivery_items WHERE referenceSdDocument IN ({ph}) LIMIT 100", order_ids)
+        # Step 4: Get Deliveries fulfilling those orders to create outer spokes
+        raw_order_ids = [r["salesOrder"] for r in orders]
+        if raw_order_ids:
+            ph = ",".join("?" * len(raw_order_ids))
+            cur.execute(f"SELECT deliveryDocument, referenceSdDocument FROM outbound_delivery_items WHERE referenceSdDocument IN ({ph}) LIMIT 200", raw_order_ids)
             delivered = cur.fetchall()
             del_ids = set()
             for row in delivered:
-                del_id = row["deliveryDocument"]
-                ref_order = row["referenceSdDocument"]
+                del_id = str(row["deliveryDocument"]).lstrip('0') or '0'
+                ref_order = str(row["referenceSdDocument"]).lstrip('0') or '0'
                 
                 if del_id not in del_ids:
                     # Add Delivery Node

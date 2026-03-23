@@ -12,6 +12,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 export default function ChatInterface() {
   const [messages, setMessages] = useState([
     { id: 1, text: "Hi! I can help you analyze the Order to Cash process. Ask me anything about the data.", isBot: true }
@@ -36,7 +38,7 @@ export default function ChatInterface() {
     setIsLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:8000/api/chat', { query: userMsg.text });
+      const res = await axios.post(`${API_BASE_URL}/api/chat`, { query: userMsg.text });
       const botMsg = { id: Date.now() + 1, text: res.data.response, isBot: true };
       setMessages(prev => [...prev, botMsg]);
     } catch (err) {

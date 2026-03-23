@@ -14,7 +14,7 @@ frontend/.eslintcache
 
 # Data & Database 
 *.db
-o2c_graph.db
+!o2c_graph.db
 sap-order-to-cash-dataset/
 *.jsonl
 *.json

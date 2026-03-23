@@ -16,12 +16,14 @@ import GraphView from './components/GraphView';
 import ChatInterface from './components/ChatInterface';
 import './index.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 function App() {
   const [graphData, setGraphData] = useState({ nodes: [], links: [] });
   const [selectedNode, setSelectedNode] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/graph')
+    fetch(`${API_BASE_URL}/api/graph`)
       .then(res => res.json())
       .then(data => setGraphData(data))
       .catch(err => console.error("Failed to load graph:", err));

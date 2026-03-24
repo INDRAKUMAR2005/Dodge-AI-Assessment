@@ -6,9 +6,11 @@ By keeping this separate, we ensure our API and AI layers don't get tangled with
 """
 
 import sqlite3
+import os
 from pathlib import Path
 
-DB_PATH = Path(r"C:\Users\INDRAKUMAR\Desktop\FDE Task\backend\o2c_graph.db")
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = BASE_DIR / "o2c_graph.db"
 
 def get_db_connection():
     """Establishes a connection to the SQLite database."""

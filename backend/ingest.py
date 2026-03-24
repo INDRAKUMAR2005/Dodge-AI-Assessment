@@ -34,6 +34,11 @@ def ingest_data():
                 # Combine partitions if multiple
                 combined_df = pd.concat(df_list, ignore_index=True)
                 
+                # Convert any nested dictionaries or lists to strings so SQLite doesn't crash
+                for col in combined_df.columns:
+                    if combined_df[col].apply(lambda x: isinstance(x, (dict, list))).any():
+                        combined_df[col] = combined_df[col].astype(str)
+                
                 # Write to SQLite
                 print(f"  Writing {len(combined_df)} rows to table '{table_name}'")
                 try:

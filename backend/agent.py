@@ -20,7 +20,7 @@ groq_key = os.environ.get("GROQ_API_KEY")
 
 # Initialize the Groq AI client
 client = Groq(api_key=groq_key)
-AI_MODEL = "llama3-8b-8192"
+AI_MODEL = "llama-3.3-70b-versatile"
 
 # Provide the AI with the map of our database so it knows how to write SQL
 SCHEMA_INFO = """
@@ -102,5 +102,7 @@ def process_chat_query(user_query: str) -> str:
         return final_answer.choices[0].message.content.strip()
         
     except Exception as e:
-        print("Error in process_chat_query:", e)
-        return f"Sorry, I encountered an error. Detail: {str(e)}"
+        import traceback
+        err_msg = traceback.format_exc()
+        print("Error in process_chat_query:", err_msg)
+        return f"Sorry, I encountered an error. Detail: {str(e)}\n\n(Traceback: {str(e.__class__.__name__)})"

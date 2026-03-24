@@ -6,6 +6,29 @@
 
 ---
 
+## ⚙️ Setup Instructions
+
+To run this project locally on your machine, clone the repository and follow these steps:
+
+### Backend Setup
+1. Navigate to the `backend/` directory.
+2. Create and activate a virtual environment: 
+   - Windows: `python -m venv venv` then `.\venv\Scripts\activate`
+   - Mac/Linux: `python3 -m venv venv` then `source venv/bin/activate`
+3. Install deep learning and database dependencies: `pip install -r requirements.txt`
+4. Create a `.env` file in the backend root and supply your OpenRouter API Token: `OPENROUTER_API_KEY=your_key`
+5. Inject and serialize the raw JSON dataset into SQLite: `python ingest.py`
+6. Boot the FastAPI engine: `uvicorn main:app --reload --port 8000`
+
+### Frontend Setup
+1. Open a new terminal and navigate to the `frontend/` directory.
+2. Install React bindings: `npm install`
+3. Start the sleek UI server: `npm run dev`
+
+The entire Next-Gen Context Node System will now be accessible at `http://localhost:5173`.
+
+---
+
 ## 🏗️ Architectural Decisions
 
 This system was built with a decoupled 3-tier architecture to ensure maximum stability, maintainability, and reasoning separation:
@@ -54,26 +77,3 @@ To prevent hallucination, arbitrary code usage, or creative misuse, strict defen
 Throughout the development cycle, the **Antigravity AI Agent** actively and autonomously processed raw datasets, debugged architectural pipeline drops, rewrote LLM query schemas logic to resolve SAP zero-padding discrepancies, and securely manipulated Render cloud variables.
 
 All interactive agent reasoning sessions, codebase modifications, UI aesthetic iterations, and dynamic log outputs are available via standard markdown exports or directly located in the `.system_generated` Antigravity environment files for transparent assessment evaluation.
-
----
-
-## ⚙️ Setup Instructions
-
-To run this project locally on your machine, clone the repository and follow these steps:
-
-### Backend Setup
-1. Navigate to the `backend/` directory.
-2. Create and activate a virtual environment: 
-   - Windows: `python -m venv venv` then `.\venv\Scripts\activate`
-   - Mac/Linux: `python3 -m venv venv` then `source venv/bin/activate`
-3. Install deep learning and database dependencies: `pip install -r requirements.txt`
-4. Create a `.env` file in the backend root and supply your OpenRouter API Token: `OPENROUTER_API_KEY=your_key`
-5. Inject and serialize the raw JSON dataset into SQLite: `python ingest.py`
-6. Boot the FastAPI engine: `uvicorn main:app --reload --port 8000`
-
-### Frontend Setup
-1. Open a new terminal and navigate to the `frontend/` directory.
-2. Install React bindings: `npm install`
-3. Start the sleek UI server: `npm run dev`
-
-The entire Next-Gen Context Node System will now be accessible at `http://localhost:5173`.

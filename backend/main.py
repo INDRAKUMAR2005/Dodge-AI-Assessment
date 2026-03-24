@@ -30,6 +30,11 @@ class ChatRequest(BaseModel):
     """Defines the shape of the data we expect from the frontend chat."""
     query: str
 
+@app.get("/")
+def read_root():
+    """Friendly welcome message for the root URL."""
+    return {"message": "Nexus Context Graph API is running perfectly! Please use the React frontend to interact with the system."}
+
 @app.get("/api/health")
 def health_check():
     """Simple endpoint to verify the backend is running."""

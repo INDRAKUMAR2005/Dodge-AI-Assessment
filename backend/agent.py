@@ -4,6 +4,8 @@ INTELLIGENCE LAYER (agent.py)
 This file is the "Brain" of the application. It takes a user's natural language question,
 uses the Groq LLM to convert it into an SQL query, executes that query via the Data Layer, 
 and translates the technical result back into plain English.
+"""
+
 import os
 import requests
 from dotenv import load_dotenv

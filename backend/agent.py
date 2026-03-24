@@ -4,13 +4,15 @@ INTELLIGENCE LAYER (agent.py)
 This file is the "Brain" of the application. It takes a user's natural language question,
 uses the Groq LLM to convert it into an SQL query, executes that query via the Data Layer, 
 and translates the technical result back into plain English.
-"""
-
 import os
 import requests
+from dotenv import load_dotenv
 from database import execute_query
 
-OPENROUTER_API_KEY = "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"
+load_dotenv()
+load_dotenv(dotenv_path="../.env")
+
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 AI_MODEL = "meta-llama/llama-3.3-70b-instruct"
 

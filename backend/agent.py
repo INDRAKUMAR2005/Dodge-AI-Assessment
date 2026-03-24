@@ -14,9 +14,9 @@ from database import execute_query
 load_dotenv()
 load_dotenv(dotenv_path="../.env")
 
-OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY")
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-AI_MODEL = "meta-llama/llama-3.3-70b-instruct"
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
+AI_MODEL = "llama-3.3-70b-versatile"
 
 # Provide the AI with the map of our database so it knows how to write SQL
 SCHEMA_INFO = """
@@ -51,7 +51,7 @@ def process_chat_query(user_query: str) -> str:
     try:
         # Step 1: Ask AI to translate the English query into SQL
         headers = {
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Authorization": f"Bearer {GROQ_API_KEY}",
             "Content-Type": "application/json"
         }
         
@@ -64,7 +64,7 @@ def process_chat_query(user_query: str) -> str:
             "temperature": 0
         }
         
-        response = requests.post(OPENROUTER_URL, headers=headers, json=payload_1)
+        response = requests.post(GROQ_URL, headers=headers, json=payload_1)
         response.raise_for_status()
         
         ai_response = response.json()['choices'][0]['message']['content'].strip()
@@ -103,7 +103,7 @@ def process_chat_query(user_query: str) -> str:
             "temperature": 0.3
         }
         
-        final_answer_resp = requests.post(OPENROUTER_URL, headers=headers, json=payload_2)
+        final_answer_resp = requests.post(GROQ_URL, headers=headers, json=payload_2)
         final_answer_resp.raise_for_status()
         
         return final_answer_resp.json()['choices'][0]['message']['content'].strip()

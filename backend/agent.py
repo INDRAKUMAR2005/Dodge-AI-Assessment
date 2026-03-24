@@ -7,20 +7,12 @@ and translates the technical result back into plain English.
 """
 
 import os
-from dotenv import load_dotenv
-from groq import Groq
+import requests
 from database import execute_query
 
-# Robustly try to load .env from current or parent directory
-load_dotenv()  
-load_dotenv(dotenv_path="../.env")
-
-# Load the key from environment variables (or .env if running locally with dotenv)
-groq_key = os.environ.get("GROQ_API_KEY")
-
-# Initialize the Groq AI client
-client = Groq(api_key=groq_key)
-AI_MODEL = "llama-3.3-70b-versatile"
+OPENROUTER_API_KEY = "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"
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+AI_MODEL = "meta-llama/llama-3.3-70b-instruct"
 
 # Provide the AI with the map of our database so it knows how to write SQL
 SCHEMA_INFO = """
@@ -54,16 +46,24 @@ def process_chat_query(user_query: str) -> str:
     """The main pipeline for processing a user's message."""
     try:
         # Step 1: Ask AI to translate the English query into SQL
-        response = client.chat.completions.create(
-            messages=[
+        headers = {
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        payload_1 = {
+            "model": AI_MODEL,
+            "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_query}
             ],
-            model=AI_MODEL,
-            temperature=0,      # Give us exact, deterministic SQL (no creativity needed here)
-            max_tokens=500
-        )
-        ai_response = response.choices[0].message.content.strip()
+            "temperature": 0
+        }
+        
+        response = requests.post(OPENROUTER_URL, headers=headers, json=payload_1)
+        response.raise_for_status()
+        
+        ai_response = response.json()['choices'][0]['message']['content'].strip()
         
         # Check if the AI triggered the Guardrail (meaning the topic was irrelevant)
         if "This system is designed" in ai_response:
@@ -93,13 +93,16 @@ def process_chat_query(user_query: str) -> str:
         Using ONLY the raw database results, synthesize a crisp, highly professional answer resolving the user's core question. State exact figures if present in the results. Do not mention SQLite or SQL directly unless the user asks for it. Structure the response nicely in Markdown.
         """
         
-        final_answer = client.chat.completions.create(
-            messages=[{"role": "user", "content": synthesis_prompt}],
-            model=AI_MODEL,
-            temperature=0.3    # Slightly higher temperature for natural sounding text
-        )
+        payload_2 = {
+            "model": AI_MODEL,
+            "messages": [{"role": "user", "content": synthesis_prompt}],
+            "temperature": 0.3
+        }
         
-        return final_answer.choices[0].message.content.strip()
+        final_answer_resp = requests.post(OPENROUTER_URL, headers=headers, json=payload_2)
+        final_answer_resp.raise_for_status()
+        
+        return final_answer_resp.json()['choices'][0]['message']['content'].strip()
         
     except Exception as e:
         import traceback

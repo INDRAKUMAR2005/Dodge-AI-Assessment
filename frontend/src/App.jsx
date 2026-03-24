@@ -79,8 +79,26 @@ function App() {
                 <span className="text-sm font-mono text-slate-700 bg-slate-100 w-fit px-1.5 py-0.5 rounded mt-0.5">{selectedNode.id}</span>
               </div>
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-xs text-slate-400 italic">Connections: N/A</span>
-                <button className="text-xs text-blue-600 font-semibold hover:text-blue-700">Explore Flow →</button>
+                <span className="text-xs text-slate-400 italic">
+                  Connections: {graphData.links.filter(l => l.source === selectedNode.id || l.target === selectedNode.id || l.source?.id === selectedNode.id || l.target?.id === selectedNode.id).length}
+                </span>
+                <button 
+                  onClick={() => {
+                    const input = document.querySelector('input[placeholder="Analyze anything..."]');
+                    if (input) {
+                      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, "value").set;
+                      nativeInputValueSetter.call(input, `Analyze all context and numbers for ${selectedNode.label} ID: ${selectedNode.id}`);
+                      input.dispatchEvent(new Event('input', { bubbles: true }));
+                      
+                      // Auto-trigger the send button logic
+                      const sendBtn = Array.from(document.querySelectorAll('button')).find(b => b.textContent === 'Send');
+                      if (sendBtn) setTimeout(() => sendBtn.click(), 100);
+                    }
+                  }}
+                  className="text-xs text-blue-600 font-semibold hover:text-blue-700 transition-colors bg-blue-50/50 px-2 py-1 rounded-md ml-2"
+                >
+                  Explore Flow →
+                </button>
               </div>
             </div>
           </div>

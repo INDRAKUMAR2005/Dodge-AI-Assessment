@@ -7,8 +7,13 @@ and translates the technical result back into plain English.
 """
 
 import os
+from dotenv import load_dotenv
 from groq import Groq
 from database import execute_query
+
+# Robustly try to load .env from current or parent directory
+load_dotenv()  
+load_dotenv(dotenv_path="../.env")
 
 # Load the key from environment variables (or .env if running locally with dotenv)
 groq_key = os.environ.get("GROQ_API_KEY")

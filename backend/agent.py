@@ -24,14 +24,18 @@ AI_MODEL = "meta-llama/llama-3.3-70b-instruct"
 
 # Provide the AI with the map of our database so it knows how to write SQL
 SCHEMA_INFO = """
-Table: business_partners (businessPartner, customer, businessPartnerFullName, businessPartnerName, industry, country)
+Table: business_partners (businessPartner, customer, businessPartnerFullName, businessPartnerName, industry)
+Table: business_partner_addresses (businessPartner, cityName, country, postalCode, region, streetName)
 Table: sales_order_headers (salesOrder, soldToParty, creationDate, totalNetAmount, transactionCurrency)
 Table: sales_order_items (salesOrder, salesOrderItem, material, requestedQuantity, requestedQuantityUnit, netAmount)
 Table: outbound_delivery_headers (deliveryDocument, creationDate, shippingPoint)
 Table: outbound_delivery_items (deliveryDocument, deliveryDocumentItem, plant, referenceSdDocument (this is salesOrder), referenceSdDocumentItem (this is salesOrderItem))
 Table: billing_document_headers (billingDocument, creationDate, totalNetAmount, transactionCurrency, soldToParty)
 Table: billing_document_items (billingDocument, billingDocumentItem, material, billingQuantity, netAmount, referenceSdDocument)
+Table: journal_entry_items_accounts_receivable (companyCode, accountingDocument, referenceDocument, transactionCurrency, amountInTransactionCurrency, customer, postingDate)
+Table: payments_accounts_receivable (companyCode, accountingDocument, clearingDate, clearingAccountingDocument, amountInTransactionCurrency, customer, invoiceReference, salesDocument, postingDate)
 Table: products (product, productType, productGroup, baseUnit)
+Table: product_descriptions (product, language, productDescription)
 """
 
 

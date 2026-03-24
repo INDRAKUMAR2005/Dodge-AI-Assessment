@@ -20,7 +20,7 @@ groq_key = os.environ.get("GROQ_API_KEY")
 
 # Initialize the Groq AI client
 client = Groq(api_key=groq_key)
-AI_MODEL = "llama-3.3-70b-versatile"
+AI_MODEL = "llama3-8b-8192"
 
 # Provide the AI with the map of our database so it knows how to write SQL
 SCHEMA_INFO = """

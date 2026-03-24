@@ -51,7 +51,11 @@ If the user asks a question that is NOT related to the business dataset (Orders,
 # Instructions
 1. First, generate a valid SQLite query to answer the question. 
    Output EXACTLY one query between ```sql and ``` with NO OTHER TEXT. 
-2. If the question violates guardrails, reply with the exact guardrail text and NO SQL.
+2. If the user asks about a Graph ID (e.g., 'Order_740603' or 'Delivery_80754575'):
+   - Strip the prefix ('Order_', 'Delivery_', 'Customer_', etc.) to get the raw ID '740603'.
+   - SAP Database IDs are typically zero-padded to 10 characters (e.g., '0000740603'). 
+   - You MUST query using `LIKE '%740603'` to ensure it correctly matches the zero-padded database string without the prefix. Example: `WHERE salesOrder LIKE '%740603'`.
+3. If the question violates guardrails, reply with the exact guardrail text and NO SQL.
 """
 
 

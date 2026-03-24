@@ -91,6 +91,9 @@ def process_chat_query(user_query: str) -> str:
             results_str = "No records found matching the criteria."
         elif len(db_results) > 20:
             results_str = str(db_results[:20]) + f"\n... and {len(db_results)-20} more."
+        else:
+            results_str = str(db_results)
+            
         synthesis_prompt = f"""User Question: {user_query}\nSQL Executed: {sql_query}\nRaw Database Results: {results_str}\n\nUsing ONLY the raw database results, synthesize a crisp answer."""
         
         # Route both logic and synthesis through the reliable 70B flagship model to ensure perfect stability.
